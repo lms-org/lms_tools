@@ -31,15 +31,10 @@ except FileExistsError:
     print("Module directory is already existing: {0}".format(module_name))
     sys.exit(1)
 
-params = {
-    "module" : module_name,
-    "module_upper" : module_name_upper,
-    "module_camel" : module_name_camel
-}
-
 def write_templ_file(file, content):
     with open(os.path.join(module_name, *file), "w") as f:
-        f.write(string.Template(content).substitute(**params))
+        f.write(string.Template(content).substitute(module=module_name,
+            module_upper=module_name_upper, module_camel=module_name_camel))
 
 write_templ_file(["CMakeLists.txt"],
 """set(SOURCES
