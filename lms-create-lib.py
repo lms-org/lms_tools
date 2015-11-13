@@ -10,11 +10,11 @@ if len(sys.argv) != 2:
 # Library's name (e.g. test_lib)
 library_name = sys.argv[1]
 
-if(library_name == ""):
+if library_name == "" :
     print("Library name must not be empty")
     sys.exit(1)
 
-if("/" in library_name or "\\" in library_name):
+if "/" in library_name or "\\" in library_name:
     print("Library name must not contain / or \\")
     sys.exit(1)
 

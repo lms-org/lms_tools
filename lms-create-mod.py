@@ -10,11 +10,11 @@ if len(sys.argv) != 2:
 # Module's name (e.g. module_name)
 module_name = sys.argv[1]
 
-if(module_name == ""):
+if module_name == "":
     print("Module name must not be empty")
     sys.exit(1)
 
-if("/" in module_name or "\\" in module_name):
+if "/" in module_name or "\\" in module_name:
     print("Module name must not contain / or \\")
     sys.exit(1)
 
