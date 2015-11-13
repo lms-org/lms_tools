@@ -1,29 +1,23 @@
-#!/usr/bin/env python3
+import pkg_resources, os
 from lxml import etree
-import sys, os
 
-script_path = os.path.dirname(os.path.realpath(sys.argv[0]))
-share_path = os.path.join(script_path, os.path.pardir, "share", "xml", "lms")
+SCHEMA = etree.XMLSchema(etree.parse(
+    pkg_resources.resource_stream(__name__, 'data/framework.xsd')))
+TRANSFORM = etree.XSLT(etree.parse(
+    pkg_resources.resource_stream(__name__, 'data/preprocess.xsl')))
 
-# Check if a path was given as command line argument
-if len(sys.argv) != 2:
-    print("Usage: lms-validate <file_or_folder>")
-    sys.exit(1)
-
-path = sys.argv[1]
-schema = etree.XMLSchema(etree.parse(os.path.join(share_path, 'framework.xsd')))
-transform = etree.XSLT(etree.parse(os.path.join(share_path, 'preprocess.xsl')))
-
-def process(file):
+def validate(file):
+    """ Validate a file or recursively all files in a directory """
     if os.path.isdir(file):
         for child in os.listdir(file):
-            process(os.path.join(file, child))
+            validate(os.path.join(file, child))
     elif file.lower().endswith(".xml"):
         validate_xml(file)
     elif file.lower().endswith(".lconf"):
         validate_lconf(file)
 
 def validate_xml(file):
+    """ Validate an XML with the help of the schema file """
     parser = etree.XMLParser()
     try:
         doc = etree.parse(file, parser)
@@ -32,15 +26,16 @@ def validate_xml(file):
         for log in parser.error_log:
             print("{0} - {1}".format(log.line, log.message))
         return
-    doc = transform(doc)
-    schema.validate(doc)
+    doc = TRANSFORM(doc)
+    SCHEMA.validate(doc)
 
-    if len(schema.error_log) != 0:
+    if len(SCHEMA.error_log) != 0:
         print(file)
         for log in schema.error_log:
             print("{0} - {1}".format(log.line, log.message))
 
 def validate_lconf(file):
+    """ Find common mistakes in a LCONF file """
     error_log = []
 
     with open(file) as f:
@@ -70,5 +65,3 @@ def validate_lconf(file):
         print(file)
         for log in error_log:
             print("{line} - {message}".format(**log))
-
-process(path)
