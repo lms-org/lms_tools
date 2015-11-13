@@ -31,7 +31,7 @@ def validate_xml(file):
 
     if len(SCHEMA.error_log) != 0:
         print(file)
-        for log in schema.error_log:
+        for log in SCHEMA.error_log:
             print("{0} - {1}".format(log.line, log.message))
 
 def validate_lconf(file):
