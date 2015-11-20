@@ -91,9 +91,5 @@ bool ${module_camel}::cycle() {
 
 MOD_INTERFACE = """#include "${module}.h"
 
-extern "C" {
-void* getInstance () {
-    return new ${module_camel}();
-}
-}
+LMS_MODULE_INTERFACE(${module_camel})
 """
