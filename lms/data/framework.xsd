@@ -71,13 +71,7 @@
   <xs:complexType name="module">
     <xs:sequence>
       <xs:element name="name" type="xs:string" />
-      <xs:choice>
-        <xs:element name="realName" type="xs:string" minOccurs="0" />
-        <xs:sequence>
-          <xs:element name="libname" type="xs:string" minOccurs="0" />
-          <xs:element name="libpath" type="xs:string" minOccurs="0" />
-        </xs:sequence>
-      </xs:choice>
+      <xs:element name="realName" type="xs:string" minOccurs="0" />
       <xs:element name="executionType" type="executionType" minOccurs="0" />
       <xs:element name="channelMapping" minOccurs="0" maxOccurs="unbounded">
         <xs:complexType>
