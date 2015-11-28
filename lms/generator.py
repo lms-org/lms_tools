@@ -93,3 +93,57 @@ MOD_INTERFACE = """#include "${module}.h"
 
 LMS_MODULE_INTERFACE(${module_camel})
 """
+
+SERVICE_CMAKE = """set(SOURCES
+    "src/${service}.cpp"
+    "src/interface.cpp"
+)
+
+set(HEADERS
+    "include/${service}.h"
+)
+
+include_directories(include)
+add_library(${service} MODULE $${SOURCES} $${HEADERS})
+target_link_libraries(${service} PRIVATE lmscore)
+"""
+
+SERVICE_README = """# $service
+
+## Config
+
+## Dependencies
+"""
+
+SERVICE_HEADER = """#ifndef ${service_upper}_H
+#define ${service_upper}_H
+
+#include <lms/service.h>
+
+/**
+ * @brief LMS service ${service}
+ **/
+class ${service_camel} : public lms::Service {
+public:
+    bool init() override;
+    bool destroy() override;
+};
+
+#endif // ${service_upper}_H
+"""
+
+SERVICE_SOURCE = """#include "${service}.h"
+
+bool ${service_camel}::init() {
+    return true;
+}
+
+bool ${service_camel}::destroy() {
+    return true;
+}
+"""
+
+SERVICE_INTERFACE = """#include "${service}.h"
+
+LMS_SERVICE_INTERFACE(${service_camel})
+"""
