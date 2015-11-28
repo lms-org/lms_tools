@@ -28,7 +28,10 @@ try:
                 "interface.cpp" : generator.SERVICE_INTERFACE
             },
             "include" : {
-                service_name + ".h" : generator.SERVICE_HEADER
+                "CMakeSharedHeaders.txt" : "",
+                service_name : {
+                    service_name + ".h" : generator.SERVICE_HEADER
+                }
             }
         }
     }, {
