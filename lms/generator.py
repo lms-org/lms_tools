@@ -104,7 +104,7 @@ set(HEADERS
 )
 
 include_directories(include)
-add_library(${service} MODULE $${SOURCES} $${HEADERS})
+add_library(${service} SHARED $${SOURCES} $${HEADERS})
 target_link_libraries(${service} PRIVATE lmscore)
 """
 
@@ -120,6 +120,8 @@ SERVICE_HEADER = """#ifndef ${service_upper}_H
 
 #include <lms/service.h>
 
+namespace ${service} {
+
 /**
  * @brief LMS service ${service}
  **/
@@ -129,10 +131,14 @@ public:
     bool destroy() override;
 };
 
+} // namespace ${service}
+
 #endif // ${service_upper}_H
 """
 
 SERVICE_SOURCE = """#include "${service}.h"
+
+namespace ${service} {
 
 bool ${service_camel}::init() {
     return true;
@@ -141,9 +147,11 @@ bool ${service_camel}::init() {
 bool ${service_camel}::destroy() {
     return true;
 }
+
+} // namespace ${service}
 """
 
 SERVICE_INTERFACE = """#include "${service}.h"
 
-LMS_SERVICE_INTERFACE(${service_camel})
+LMS_SERVICE_INTERFACE(${service}::${service_camel})
 """
