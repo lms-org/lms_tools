@@ -68,6 +68,17 @@
     <xs:attribute name="src" type="xs:string" use="required" />
   </xs:complexType>
 
+  <xs:complexType name="config">
+    <!-- TODO content OR src attribute -->
+    <xs:complexContent>
+      <xs:extension base="xs:anyType">
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="src" type="xs:string" />
+        <xs:attribute name="user" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:complexType name="module">
     <xs:sequence>
       <xs:element name="name" type="xs:string" />
@@ -80,18 +91,15 @@
           <xs:attribute name="priority" type="xs:integer" />
         </xs:complexType>
       </xs:element>
-      <xs:element name="config" minOccurs="0" maxOccurs="unbounded">
-        <!-- TODO content OR src attribute -->
-        <xs:complexType>
-          <xs:complexContent>
-            <xs:extension base="xs:anyType">
-              <xs:attribute name="name" type="xs:string" />
-              <xs:attribute name="src" type="xs:string" />
-              <xs:attribute name="user" type="xs:string" />
-            </xs:extension>
-          </xs:complexContent>
-        </xs:complexType>
-      </xs:element>
+      <xs:element name="config" type="config" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="service">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" />
+      <xs:element name="realName" type="xs:string" minOccurs="0" />
+      <xs:element name="config" type="config" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -111,6 +119,7 @@
     <xs:complexType>
       <xs:choice maxOccurs="unbounded">
         <xs:element name="module" type="module" />
+        <xs:element name="service" type="service" />
         <xs:element name="include" type="include" />
         <xs:element name="runtime" type="runtime" />
         <xs:element name="execution" type="execution" />
