@@ -100,7 +100,7 @@ SERVICE_CMAKE = """set(SOURCES
 )
 
 set(HEADERS
-    "include/${service}.h"
+    "include/${service}/${service}.h"
 )
 
 include_directories(include)
@@ -128,7 +128,7 @@ namespace ${service} {
 class ${service_camel} : public lms::Service {
 public:
     bool init() override;
-    bool destroy() override;
+    void destroy() override;
 };
 
 } // namespace ${service}
@@ -136,7 +136,7 @@ public:
 #endif // ${service_upper}_H
 """
 
-SERVICE_SOURCE = """#include "${service}.h"
+SERVICE_SOURCE = """#include "${service}/${service}.h"
 
 namespace ${service} {
 
@@ -144,14 +144,13 @@ bool ${service_camel}::init() {
     return true;
 }
 
-bool ${service_camel}::destroy() {
-    return true;
+void ${service_camel}::destroy() {
 }
 
 } // namespace ${service}
 """
 
-SERVICE_INTERFACE = """#include "${service}.h"
+SERVICE_INTERFACE = """#include "${service}/${service}.h"
 
 LMS_SERVICE_INTERFACE(${service}::${service_camel})
 """
