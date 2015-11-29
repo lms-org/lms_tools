@@ -7,6 +7,8 @@ def get_ip_addresses():
     ip_list = []
 
     for interface in netifaces.interfaces():
+        if interface == "lo":
+            continue # skip loopback interface
         info = netifaces.ifaddresses(interface)
         if netifaces.AF_INET in info:
             for inet in info[netifaces.AF_INET]:
