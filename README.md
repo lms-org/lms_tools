@@ -23,3 +23,25 @@ sudo ./setup.py install
   current working directory.
 - `lms-create-service.py <service_name>` - Generate a skeleton for a service in
   the current working directory.
+- `report-device-ip.py <url>` - Gather all IPv4 addresses on local network
+  interfaces and send them via HTTP POST.
+
+## Device IP
+### Client
+Install requirements:
+```
+sudo apt-get install python3 python3-pip
+sudo python3 -m pip install requests netifaces
+```
+
+Append the following line to `/etc/crontab`. Insert your own user name, the path
+to the python client script and the full URL to the php backend script.
+```
+*/3 * * * * my_user_name /path/to/script/report-device-ip.py http://example.com/device-ip-backend.php
+```
+
+### Server
+Move `device-ip-backend.php` to `/var/www/html` or a similar place to make
+it available on your web server. The script will persist data in a `data.txt`
+file in the same directory. Make sure PHP has write permissions in its parent
+directory.
