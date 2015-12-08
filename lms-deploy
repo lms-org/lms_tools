@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+import os, sys, hashlib
+from subprocess import call
+import getpass
+import stat
+
+if len(sys.argv) < 2 or len(sys.argv) > 3:
+    print("Usage: lms-deploy <source-dir> <deploy-target>")
+    sys.exit(1)
+
+source_dir = os.path.abspath(sys.argv[1])
+digest = hashlib.sha1(str.encode(source_dir)).hexdigest()
+binary_dir = os.path.join(os.path.expanduser("~"), ".lms", getpass.getuser()
+    + "." + os.path.basename(source_dir) + "." + digest[0:6])
+
+try:
+    os.makedirs(binary_dir)
+except OSError as e:
+    pass # ignore errors here
+
+os.chdir(binary_dir)
+os.environ["CC"] = "/usr/bin/arm-linux-gnueabihf-gcc"
+os.environ["CXX"] = "/usr/bin/arm-linux-gnueabihf-g++"
+call(["cmake", source_dir])
+call(["make", "-j4"])
+
+call(["cp", "-R", os.path.join(source_dir, "configs"), binary_dir])
+
+RUN_SCRIPT = """#/bin/bash
+basedir=$(dirname $0)
+export LD_LIBRARY_PATH=${basedir}:${basedir}/external/libraries
+export LMS_MODULE_PATH=${basedir}/external/modules
+export LMS_SERVICE_PATH=${basedir}/external/services
+export LMS_CONFIG_PATH=${basedir}/configs
+${basedir}/lms "$@"
+"""
+
+run_file = os.path.join(binary_dir, "run")
+with open(run_file, "w") as f:
+    f.write(RUN_SCRIPT)
+st = os.stat(run_file)
+os.chmod(run_file, st.st_mode | stat.S_IEXEC)
+
+if len(sys.argv) == 3:
+    deploy_target = sys.argv[2]
+
+    call(["rsync", "-r", "--progress", "--exclude=CMakeFiles",
+        "--exclude=*.cmake", "--exclude=Makefile", binary_dir, deploy_target + ":~/"])
