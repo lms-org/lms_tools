@@ -58,7 +58,6 @@ MOD_README = """# $module
 MOD_HEADER = """#ifndef ${module_upper}_H
 #define ${module_upper}_H
 
-#include <lms/datamanager.h>
 #include <lms/module.h>
 
 /**
