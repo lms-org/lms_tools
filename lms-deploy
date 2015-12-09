@@ -21,8 +21,17 @@ except OSError as e:
 os.chdir(binary_dir)
 os.environ["CC"] = "/usr/bin/arm-linux-gnueabihf-gcc"
 os.environ["CXX"] = "/usr/bin/arm-linux-gnueabihf-g++"
-call(["cmake", source_dir])
-call(["make", "-j4"])
+
+ret = call(["cmake", source_dir, "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+    "-DEXCLUDES=ogre_binding ogre_window_manager image_renderer ogre_input"])
+if ret != 0:
+    print("CMake failed")
+    sys.exit(1)
+
+ret = call(["make", "-j4"])
+if ret != 0:
+    print("Make failed")
+    sys.exit(1)
 
 call(["cp", "-R", os.path.join(source_dir, "configs"), binary_dir])
 
@@ -44,5 +53,8 @@ os.chmod(run_file, st.st_mode | stat.S_IEXEC)
 if len(sys.argv) == 3:
     deploy_target = sys.argv[2]
 
-    call(["rsync", "-r", "--progress", "--exclude=CMakeFiles",
+    ret = call(["rsync", "-r", "-v", "-u", "--exclude=CMakeFiles",
         "--exclude=*.cmake", "--exclude=Makefile", binary_dir, deploy_target + ":~/"])
+    if ret != 0:
+        print("rsync failed")
+        sys.exit(1)
