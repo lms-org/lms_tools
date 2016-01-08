@@ -37,7 +37,7 @@ call(["cp", "-R", os.path.join(source_dir, "configs"), binary_dir])
 
 RUN_SCRIPT = """#/bin/bash
 basedir=$(dirname $0)
-export LD_LIBRARY_PATH=${basedir}:${basedir}/external/libraries
+export LD_LIBRARY_PATH=${basedir}:${basedir}/external/libraries:${basedir}/external/services
 export LMS_MODULE_PATH=${basedir}/external/modules
 export LMS_SERVICE_PATH=${basedir}/external/services
 export LMS_CONFIG_PATH=${basedir}/configs
