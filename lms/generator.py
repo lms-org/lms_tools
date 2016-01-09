@@ -1,4 +1,4 @@
-import os, string, re
+import os, string, re, sys
 
 def mktree(path, tree, params):
     for child, content in tree.items():
@@ -13,6 +13,29 @@ def mktree(path, tree, params):
 
 def camel_case(name):
     return re.sub(r"(?:^|_)([a-z])", lambda x: x.group(1).upper(), name)
+
+def cli(tool_name, tree, params):
+    # Check if the name was given as command line argument
+    if len(sys.argv) != 2:
+        print("Usage: {} <name>".format(tool_name))
+        sys.exit(1)
+
+    # Object's name (e.g. test_lib, my_module, super_service)
+    name = sys.argv[1]
+
+    if name == "" :
+        print("Name must not be empty")
+        sys.exit(1)
+
+    if "/" in name or "\\" in name:
+        print("Name must not contain / or \\")
+        sys.exit(1)
+
+    try:
+        mktree(".", tree(name), params(name))
+    except FileExistsError:
+        print("Creation failed")
+        sys.exit(1)
 
 LIB_CMAKE = """set(SOURCES
 # src/file.cpp
