@@ -1,3 +1,5 @@
+import numpy as np
+
 def parse(file):
     current_time = 0
     begin_times = {}
@@ -26,3 +28,37 @@ def parse(file):
                 # save string mapping for later usage
                 string_mapping[int(row[1])] = row[2]
     return data
+
+class Profiling:
+    begin_times = {}
+    data = {}
+
+    def feed(self, flag, timestamp, label):
+        if flag == 0:
+            self.begin_times[label] = timestamp
+        elif flag == 1:
+            if label in self.begin_times:
+                begin = self.begin_times[label]
+                delta = timestamp - begin
+                if label not in self.data:
+                    self.data[label] = []
+                self.data[label].append(delta)
+            else:
+                print("Unknown label: {}".format(label))
+        else:
+            print("Unknown flag")
+
+    def analyze(self):
+        """ Compute mean/std/min/max for every process idependently """
+        result = []
+        for key in self.data:
+            exec_times = self.data[key]
+            result.append({
+                "label" : key,
+                "min" : np.amin(exec_times),
+                "max" : np.amax(exec_times),
+                "mean" : np.mean(exec_times),
+                "std" : np.std(exec_times),
+                "count" : len(exec_times)
+            })
+        return result

@@ -49,3 +49,10 @@ Move `device-ip-backend.php` to `/var/www/html` or a similar place to make
 it available on your web server. The script will persist data in a `data.txt`
 file in the same directory. Make sure PHP has write permissions in its parent
 directory.
+
+## Deploy Script
+You need to install `gcc` and `g++` for ARM HardFloat. On Ubuntu this is done via
+
+```
+sudo apt-get install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+```

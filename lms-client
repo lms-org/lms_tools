@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+import socket
+import struct
+from lms import profiling
+import matplotlib.pyplot as plt
+import numpy as np
+
+LOG_LEVEL = {
+    0 : "ALL  ",
+    1 : "DEBUG",
+    2 : "INFO ",
+    3 : "WARN ",
+    4 : "ERROR",
+    255 : "OFF  "
+}
+
+PROFILING_FLAG = {
+    0 : "BEGIN",
+    1 : "END  "
+}
+
+MESSAGE_TYPE_LOGGING = 1
+MESSAGE_TYPE_PROFILING = 2
+
+HEADER = struct.Struct(">IB")
+LOGGING = struct.Struct(">BBB")
+PROFILING = struct.Struct(">BqB")
+
+prof = profiling.Profiling()
+
+plt.ion()
+plt.show()
+
+def display_process(data):
+    data = sorted(data, key=lambda x: x["mean"])
+
+    y_pos = np.arange(len(data))
+    y_label = [x["label"] for x in data]
+    x = [x["mean"] for x in data]
+    error = [x["std"] for x in data]
+
+    plt.hold(False)
+    plt.barh(y_pos, x, xerr=error, align='center', alpha=0.4)
+    plt.yticks(y_pos, y_label)
+    plt.xlabel("Execution time (us)")
+    plt.title('Profiling Data Analysis')
+
+    plt.draw()
+
+def read_message_header(buffer):
+    if len(buffer) >= HEADER.size:
+        return HEADER.unpack(buffer[0 : HEADER.size])
+    else:
+        return None, None
+
+def process_logging(buffer):
+    log_level, tag_len, text_len = LOGGING.unpack(buffer[0 : LOGGING.size])
+    log_level = LOG_LEVEL[log_level]
+    tag = buffer[LOGGING.size : LOGGING.size+tag_len].decode("utf-8")
+    text = buffer[LOGGING.size+tag_len : LOGGING.size+tag_len+text_len].decode("utf-8")
+    print("{} {} {}".format(log_level, tag, text))
+
+def process_profiling(buffer):
+    flag, timestamp, label_len = PROFILING.unpack(buffer[0 : PROFILING.size]);
+    label = buffer[PROFILING.size : PROFILING.size+label_len].decode("utf-8")
+    print("{} {} {}".format(PROFILING_FLAG[flag], timestamp, label))
+    prof.feed(flag, timestamp, label)
+    display_process(prof.analyze())
+
+sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+sock.connect("/tmp/lms.sock")
+
+buffer = b"";
+
+while True:
+    buffer += sock.recv(4096)
+    processed = True
+
+    while processed:
+        msg_len, msg_type = read_message_header(buffer)
+        if msg_len is not None and len(buffer) >= msg_len + HEADER.size:
+            msg = buffer[HEADER.size : HEADER.size+msg_len]
+            if msg_type == MESSAGE_TYPE_LOGGING:
+                process_logging(msg)
+            elif msg_type == MESSAGE_TYPE_PROFILING:
+                process_profiling(msg)
+
+            buffer = buffer[HEADER.size+msg_len :]
+        else:
+            processed = False
+
+sock.close()

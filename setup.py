@@ -12,5 +12,5 @@ setup(name='LMS-Tools',
     package_data={'lms': ['data/framework.xsd', 'data/preprocess.xsl']},
     scripts=['lms-profiler.py', 'lms-validate.py', 'lms-create-lib.py',
         'lms-create-mod.py', 'lms-flags.py', 'lms-create-service.py',
-        'lms-deploy']
+        'lms-deploy', 'lms-client']
 )
