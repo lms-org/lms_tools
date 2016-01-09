@@ -1,3 +1,5 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/grade/4002ab6d8f66418f839f4ce1121e2397)](https://www.codacy.com/app/hans-kirchner-info/lms_tools)
+
 The LMS Tools are a collection of Python scripts useful when working with LMS.
 I suggest using Python 3 but Python 2 should work as well for most scripts.
 
@@ -25,6 +27,8 @@ sudo ./setup.py install
   the current working directory.
 - `report-device-ip.py <url>` - Gather all IPv4 addresses on local network
   interfaces and send them via HTTP POST.
+- `lms-deploy <source_dir> <deploy_target>` - Compile the given config repository
+  locally for ARM and deploy it via rsync on a remote computer.
 
 ## Device IP
 ### Client
