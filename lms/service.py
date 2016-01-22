@@ -5,13 +5,13 @@ def main():
         print("This system may not be using SysVinit")
         sys.exit(1)
 
-    with pkg_resources.resource_stream(__name__, 'data/init') as init_script:
+    with open(pkg_resources.resource_filename(__name__, 'data/init'), "r") as init_script:
         with open("/etc/init.d/lms", "w") as f:
             f.write(init_script.read())
 
     os.chmod("/etc/init.d/lms", 0o755)
 
-    with pkg_resources.resource_stream(__name__, 'data/init.config') as init_config:
+    with open(pkg_resources.resource_filename(__name__, 'data/init.config'), "r") as init_config:
         with open("/etc/default/lms", "w") as f:
             f.write(string.Template(init_config.read()).substitute({
                 "TARGET" : os.path.abspath(sys.argv[2]),
