@@ -23,7 +23,7 @@ os.environ["CC"] = "/usr/bin/arm-linux-gnueabihf-gcc"
 os.environ["CXX"] = "/usr/bin/arm-linux-gnueabihf-g++"
 
 ret = call(["cmake", source_dir, "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
-    "-DEXCLUDES=ogre_binding ogre_window_manager image_renderer ogre_input"])
+    "-DEXCLUDES=ogre_binding ogre_window_manager image_renderer ogre_input sdl_service sdl_image_renderer"])
 if ret != 0:
     print("CMake failed")
     sys.exit(1)
