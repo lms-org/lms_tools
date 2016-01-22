@@ -9,8 +9,9 @@ setup(name='LMS-Tools',
     author_email='hans.kirchner.info@gmail.com',
     url='https://github.com/lms-org/lms_tools',
     packages=['lms'],
-    package_data={'lms': ['data/framework.xsd', 'data/preprocess.xsl']},
+    package_data={'lms': ['data/framework.xsd', 'data/preprocess.xsl',
+        'data/init', 'data/init.config']},
     scripts=['lms-profiler.py', 'lms-validate.py', 'lms-create-lib.py',
         'lms-create-mod.py', 'lms-flags.py', 'lms-create-service.py',
-        'lms-deploy', 'lms-client']
+        'lms-deploy', 'lms-client', 'lms-service']
 )

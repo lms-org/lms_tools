@@ -1,0 +1,109 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          lms
+# Required-Start:    $remote_fs $named
+# Required-Stop:     $remote_fs $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: LMS Boot script
+# Description:       Starts a deployed lms instance after boot
+### END INIT INFO
+
+# Author: Hans Kirchner <hans-kirchner@gmx.de>
+
+# Do NOT "set -e"
+
+# PATH should only include /usr/* if it runs after the mountnfs.sh script
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="Start a given LMS config repo"
+NAME=lms
+
+# Read configuration variable file if it is present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+DAEMON=$TARGET/$NAME
+DAEMON_ARGS="$TARGET_ARGS"
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Exit if the package is not installed
+[ -x "$DAEMON" ] || exit 0
+
+#
+# Function that starts the daemon/service
+#
+do_start()
+{
+	do_status
+
+	if [ "$?" -eq 0 ]; then
+		echo "LMS is already running."
+		exit 1
+	fi
+
+	if [ `id -u` -ne 0 ]; then
+		daemon --name=lms --inherit -- $DAEMON $ARGS
+	else
+		daemon --name=lms --user=$TARGET_USER --inherit -- $DAEMON $ARGS
+	fi
+
+	echo "LMS started."
+}
+
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+	do_status
+
+	if [ "$?" -ne 0 ]; then
+		echo "LMS is not running."
+		exit 1
+	fi
+
+	if [ `id -u` -ne 0 ]; then
+		daemon --name=lms --stop
+	else
+		daemon --name=lms --user=$TARGET_USER --stop
+	fi
+
+	echo "LMS stopped."
+}
+
+do_status()
+{
+	if [ `id -u` -ne 0 ]; then
+		daemon --name=lms --running
+	else
+		daemon --name=lms --user=$TARGET_USER --running
+	fi
+	return "$?"
+}
+
+case "$1" in
+  start)
+		do_start
+		;;
+  stop)
+		do_stop
+		;;
+  status)
+		do_status
+		if [ "$?" -ne 0 ]; then
+			echo "LMS not running"
+		else
+			echo "LMS running"
+		fi
+		;;
+  restart|force-reload)
+		do_stop
+		do_start
+		;;
+  *)
+		echo "Usage: $SCRIPTNAME {start|stop|status|restart}" >&2
+		exit 3
+		;;
+esac
+
+:
