@@ -4,6 +4,7 @@ import struct
 from lms import profiling
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
 LOG_LEVEL = {
     0 : "ALL  ",
@@ -67,8 +68,12 @@ def process_profiling(buffer):
     prof.feed(flag, timestamp, label)
     display_process(prof.analyze())
 
-sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-sock.connect("/tmp/lms.sock")
+#sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+#sock.connect("/tmp/lms.sock")
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect((sys.argv[1], int(sys.argv[2])))
+#sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+#sock.connect(('::1', 8080, 0, 0))
 
 buffer = b"";
 
@@ -84,6 +89,8 @@ while True:
                 process_logging(msg)
             elif msg_type == MESSAGE_TYPE_PROFILING:
                 process_profiling(msg)
+            else:
+                print("Unknown message type: {}".format(msg_type))
 
             buffer = buffer[HEADER.size+msg_len :]
         else:
