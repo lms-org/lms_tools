@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#Installs a dependency with all its dependencies
 import sys, os
 from lms import install_utils
 
@@ -8,16 +9,25 @@ if len(sys.argv) != 2:
 
 package = sys.argv[1]
 
-packageUrl = install_utils.getPackageUrlFromName(package)
+def installPackageWithDependencies(package):
+    packageUrl = install_utils.getPackageUrlFromName(package)
 
-#check if a url was set
-if packageUrl == None:
-    print("Package not found!")
-    sys.exit(1)
+    #check if a url was set
+    if packageUrl == None:
+        print("Package not found: "+package)
+        sys.exit(1)
 
-print(packageUrl)
+    print(packageUrl)
 
-install_utils.installPackage(package,packageUrl)
-# TODO check if package is valid
+    #install package
+    install_utils.installPackage(package,packageUrl)
 
+    #get dependencies
+    dependencies = install_utils.getPackageDependencies(package)
+    print(dependencies)
 
+    for dependency in dependencies:
+        print("installing dependency: " +dependency) 
+        installPackageWithDependencies(dependency)
+
+installPackageWithDependencies(package)

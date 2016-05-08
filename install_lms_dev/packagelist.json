@@ -3,7 +3,7 @@
     "path": "https://github.com/lms-org/imaging",
     "description": "Darstellung von Bildern"},
 
-"mypackage1":{
-    "path": "github.com/lms-org/mypackage1",
+"package1":{
+    "path": "/home/phibedy/Documents/programming/c++/lms/lms_tools/install_lms_dev/package1",
     "description": "Darstellung von Bildern"}
 }

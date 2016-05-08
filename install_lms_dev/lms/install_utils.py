@@ -3,8 +3,7 @@
 import xml.etree.ElementTree
 import json
 import sys, os
-from subprocess import call
-
+import subprocess
 
 def parseFrameworkXml(configFilePath):
     root = xml.etree.ElementTree.parse(configFilePath).getroot()
@@ -14,18 +13,26 @@ def parseFrameworkXml(configFilePath):
     return usedPackages
 
 
-def parsePackageList(packageFilePath):
+def parseJson(packageFilePath):
     with open(packageFilePath) as file:
         return json.load(file)
+
+def getDefaultPackageList():
+    homeDir = os.path.expanduser("~")
+    return  homeDir+'/lms/packagelist.json'
 
 def getPackageLists():
     result = set()
     result.add('packagelist.json') # TODO hier später alle möglichen ausführen
+    result.add(getDefaultPackageList())
     return result
 
 def getPackageUrlFromName(packageName):
     for packageListPath in getPackageLists():
-        packagesData = parsePackageList(packageListPath)
+        if not os.path.isfile(packageListPath):
+            print('packageFile does not exist: '+packageListPath)
+            continue
+        packagesData = parseJson(packageListPath)
         if packageName in packagesData:
             return packagesData[packageName]['path']
 
@@ -39,26 +46,84 @@ def getNeededPackageUrls(neededPackages,packagesData):
     return result
 
 def isGitUrl(url):
-    return True #TODO
+    if 'github.com' in url: #TODO
+        return True
+    return False
 
 def isLocalFolder(url):
-    return False #TODO
+    if os.path.isdir(url):
+        return True
+    return False
 
 def isZipFile(url):
     return False #TODO
 
 def installPackage(packageName,packageUrl):
+    dir = 'dependencies/'+packageName;
+    dirAbs = os.path.abspath(dir)
     if isGitUrl(packageUrl):
-        #TODO check if folder already exists
-        ret = call(["git","clone",packageUrl, 'dependencies/'+packageName])
+        #check if folder already exists
+        if os.path.isdir(dir):
+            #pull the dir
+            p = subprocess.Popen(['git', 'pull'], cwd=dir)
+            output, err = p.communicate();
+            if output != 0:
+                print("pull failed")
+                sys.exit(1)
+            #TODO error handling
+        else : 
+            ret = call(["git","clone",packageUrl, dir])
         if ret != 0:
             print("clone failed")
             sys.exit(1)
         print("cloned package")
-    if isLocalFolder :
-        #TODO create hardlink
+    elif isLocalFolder(packageUrl) :
+        print('hadle local package: ' +packageName)
+        if not os.path.isabs(packageUrl):
+            packageUrl = os.path.abspath(packageUrl);
+        #create symlink
+        #check if symlink already exists TODO check if valid
+        if not os.path.exists(packageUrl):
+            os.symlink(packageUrl, dirAbs, True)
+        else:
+            print(packageUrl + ' already exists')
     else :
         print("no valid url-type given")
         sys.exit(1)
+
+def getPackageNameFromPath(path):
+    packageFile = path+'/lms_package.json'
+    if not os.path.isfile(packageFile):
+        print('lms_package.json does not exist in: ' + package)
+        return;
+    packageData = parseJson(packageFile) #TODO error handling
+    return packageData['name']
         
 
+def getPackageDependencies(packageName):
+    dir = 'dependencies/'+packageName
+    packageFile = dir+'/lms_package.json'
+    if not os.path.isdir(dir):
+        print('package does not exist: ' + package)
+        return;
+    if not os.path.isfile(packageFile):
+        print('lms_package.json does not exist in: ' + package)
+        return;
+    packageData = parseJson(packageFile) #TODO error handling
+    return packageData['dependencies'].split(',')
+
+
+def registerPackage(packageName,packageUrl, packageListUrl):
+    json.dump({packageName : {'path':packageListUrl}}, sort_keys=True, indent=4)
+    print('registering package: ' +packageName + packageUrl)
+    if os.path.isfile(packageListPath):
+        json = parseJson(packageListPath)
+    else:
+        print(".")
+    #TODO write to file
+    #TODO errorhandling
+    json.add
+    
+    
+    
+    

@@ -1,5 +1,5 @@
 {
-"name": "testname",
+"name": "package1",
 "dependencies":"lib1,lib2,lib3",
 "description":"Test package file"
 }
