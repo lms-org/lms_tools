@@ -5,5 +5,11 @@
 
 "package1":{
     "path": "/home/phibedy/Documents/programming/c++/lms/lms_tools/install_lms_dev/package1",
-    "description": "Darstellung von Bildern"}
+    "description": "package1 desc"},
+"lib1":{
+    "path": "/home/phibedy/Documents/programming/c++/lms/lms_tools/install_lms_dev/lib1",
+    "description": "lib1 desc"},
+"lib2":{
+    "path": "/home/phibedy/Documents/programming/c++/lms/lms_tools/install_lms_dev/lib2",
+    "description": "lib2 desc"}
 }

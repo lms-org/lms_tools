@@ -83,10 +83,10 @@ def installPackage(packageName,packageUrl):
             packageUrl = os.path.abspath(packageUrl);
         #create symlink
         #check if symlink already exists TODO check if valid
-        if not os.path.exists(packageUrl):
+        if not os.path.exists(dirAbs):
             os.symlink(packageUrl, dirAbs, True)
         else:
-            print(packageUrl + ' already exists')
+            print(dirAbs + ' already exists')
     else :
         print("no valid url-type given")
         sys.exit(1)
@@ -104,13 +104,15 @@ def getPackageDependencies(packageName):
     dir = 'dependencies/'+packageName
     packageFile = dir+'/lms_package.json'
     if not os.path.isdir(dir):
-        print('package does not exist: ' + package)
+        print('package does not exist: ' + packageName)
         return;
     if not os.path.isfile(packageFile):
         print('lms_package.json does not exist in: ' + package)
         return;
     packageData = parseJson(packageFile) #TODO error handling
-    return packageData['dependencies'].split(',')
+    if 'dependencies' in packageData:
+        return packageData['dependencies']
+    return list()
 
 
 def registerPackage(packageName,packageUrl, packageListUrl):
@@ -122,8 +124,38 @@ def registerPackage(packageName,packageUrl, packageListUrl):
         print(".")
     #TODO write to file
     #TODO errorhandling
-    json.add
+    #json.add
     
-    
-    
+
+def getPackageTargets(packageName):
+    dir = 'dependencies/'+packageName
+    packageFilePath = dir+'/lms_package.json'
+    json = parseJson(packageFilePath)
+    if 'targets' in json:
+        return json['targets']
+    targets = list()
+    targets.add(packageName)
+    return targets
+
+def getPackageAbsPath(relativePath, packageName):
+    dir = 'dependencies/'+packageName+'/'+relativePath;
+    return os.path.abspath(dir)
+
+def getPackageIncludes(packageName, absPath=True):
+    dir = 'dependencies/'+packageName
+    packageFilePath = dir+'/lms_package.json'
+    json = parseJson(packageFilePath)
+    if 'includes' in json:
+        includes = json['includes']
+    else:
+        includes = list()
+        includes.add('include')
+        
+    result = list()
+    for include in includes:
+        if absPath:
+            result.append(getPackageAbsPath(include,packageName))
+        else:
+            result.append(include)
+    return result
     
